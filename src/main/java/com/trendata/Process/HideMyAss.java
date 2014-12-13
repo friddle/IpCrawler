@@ -18,8 +18,18 @@ import java.util.List;
  * Created by friddle on 12/11/14.
  */
 public class HideMyAss implements PageProcessor {
-	public String host = "127.0.0.1";
-	public int port = 8087;
+    OrmPipeline mPipeline=new OrmPipeline();
+    Site mSite=Site.me();
+
+    public void setPipeline(OrmPipeline pipeline)
+    {
+        this.mPipeline=pipeline;
+    }
+
+    public void setOnSite(Site site)
+    {
+        this.mSite=site;
+    }
 
 	@Override
 	public void process(Page page) {
@@ -39,7 +49,6 @@ public class HideMyAss implements PageProcessor {
 				ass.ConnectionTime = new Html(items.get(5)).xpath("//div/@value").toString();
 				ass.type = new Html(items.get(6)).xpath("//lastd/text()").regex("\\w+").toString();
 				ass.ips = getIps(items.get(1));
-				OrmPipeline mPipeline = new OrmPipeline();
 				mPipeline.setClassType(ass.getClass());
 				mPipeline.process(ass, null);
 			} catch (Exception e) {
@@ -94,10 +103,7 @@ public class HideMyAss implements PageProcessor {
 
 	@Override
 	public Site getSite() {
-		Site mSite = Site.me();
-		//HttpHost mProxy=new HttpHost(host,port,null);
-		//mSite.setHttpProxy(mProxy);
-		return mSite;
+        return this.mSite;
 	}
 
 

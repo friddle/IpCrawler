@@ -16,18 +16,40 @@ import java.sql.SQLException;
  * Created by friddle on 3/10/14.
  */
 public class OrmPipeline implements PageModelPipeline {
+    public String host="jdbc:mysql://localhost/spider";
+    public String user="root";
+    public String passwd="qushu_2018";
+    public String type="mysql";
     JdbcConnectionSource connectionSource;
 	Class t;
-
 	public void setClassType(Class t)
 	{
 		this.t=t;
 	}
 
+    public void setDatabase(String host,String user,String passwd,String type) throws SQLException {
+        this.host=host;
+        this.user=user;
+        this.passwd=passwd;
+        this.type=type;
+        initOrm();
+    }
+
+    public OrmPipeline()
+    {
+        try
+        {
+            initOrm();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void process(Object o, Task task) {
         try {
-            initOrm();
             reflect(o);
             System.out.println(ToStringBuilder.reflectionToString(o));
         } catch (SQLException e) {
@@ -45,14 +67,15 @@ public class OrmPipeline implements PageModelPipeline {
 	}
 
     public void initOrm() throws SQLException {
-        if (connectionSource == null) {
-            String databaseUrl = "jdbc:mysql://localhost/spider";
-            connectionSource =new JdbcConnectionSource(databaseUrl);
-            connectionSource.setPassword("88636311");
-            connectionSource.setUsername("root");
+        connectionSource =new JdbcConnectionSource(this.host);
+        connectionSource.setPassword(this.passwd);
+        connectionSource.setUsername(this.user);
+        connectionSource.setDatabaseType(new MysqlDatabaseType());
+        if(this.type.toLowerCase().contains("mysql"))
+        {
             connectionSource.setDatabaseType(new MysqlDatabaseType());
-			createTable();
         }
+        createTable();
     }
 }
 
